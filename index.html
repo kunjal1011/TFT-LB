@@ -2,316 +2,1071 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TFT Lookbook Generator</title>
-  <link rel="shortcut icon" href="https://techfashiontour.com/images/tft-favicon.png">
-    <!-- CSS FILES -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>TFT Lookbook Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
 
-    <link href="https://techfashiontour.com/css/bootstrap.min.css" rel="stylesheet">
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #000 0%, #1a1a1a 50%, #000 100%);
+            z-index: -1;
+        }
 
-    <link href="https://techfashiontour.com/css/bootstrap-icons.css" rel="stylesheet">
+        .background-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            background-image:
+                radial-gradient(circle at 25% 25%, #0fa49c 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, #ff6b6b 0%, transparent 50%);
+            z-index: -1;
+        }
 
-    <link href="https://techfashiontour.com/css/templatemo-festava-live.css" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+        .container {
+            max-width: 430px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        header.kjheader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 10px 40px;
+        }
+
+        .content {
+            padding: 32px 24px 40px;
+        }
+
+        .upload-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .upload-option {
+            background: linear-gradient(135deg,
+                    rgba(255, 255, 255, 0.08) 0%,
+                    rgba(255, 255, 255, 0.02) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 28px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .upload-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.1) 50%,
+                    transparent 100%);
+            transition: left 0.5s ease;
+        }
+
+        .upload-option:hover::before {
+            left: 100%;
+        }
+
+        .upload-option:hover {
+            transform: translateY(-4px);
+            border-color: rgb(15 164 156);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.15);
+        }
+
+        .upload-option:active {
+            transform: translateY(-2px);
+        }
+
+        .upload-option .icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .upload-option .title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .upload-option .subtitle {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 400;
+        }
+
+        .upload-option.disabled {
+            background: rgba(255, 255, 255, 0.02);
+            border-color: rgba(255, 255, 255, 0.05);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .upload-option.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        #fileUploadSection {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 40px 24px;
+            text-align: center;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+
+        #fileUploadSection:hover {
+            border-color: rgb(15 164 156);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        #fileUploadSection h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 16px;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="file"]:focus {
+            outline: none;
+            border-color: #0faaa3;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0faaa3 0%, #0fa49c 100%);
+            color: #fff;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 160px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        #status {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+        .media-preview {
+            margin: 24px 0;
+            border-radius: 20px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        canvas {
+            width: 100%;
+            border-radius: 20px;
+            display: none;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 20px;
+            display: none;
+        }
+
+        #cameraPreview {
+            border: 2px solid #0faaa3;
+        }
+
+        .camera-controls {
+            display: none;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 24px 0;
+        }
+
+        .camera-controls button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .camera-controls button:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        #capturePhotoBtn {
+            background: linear-gradient(135deg, #0faaa3 0%, #0099cc 100%);
+            border-color: #0faaa3;
+        }
+
+        #loader {
+            display: none;
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #0faaa3;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 32px 0;
+        }
+
+        .action-button {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: none;
+            min-width: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+        }
+
+        #downloadButton {
+            background: linear-gradient(135deg, #0fa49c 0%, #0099cc 100%);
+            color: white;
+            border: 1px solid #0fa49c;
+        }
+
+        #shareButton {
+            background: linear-gradient(135deg, #ff6b6b 0%, #cc5555 100%);
+            color: white;
+            border: 1px solid #ff6b6b;
+        }
+
+        .reset-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 14px 24px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 24px auto;
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        .reset-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .share-status {
+            margin: 20px 0;
+            padding: 16px;
+            border-radius: 16px;
+            display: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+            border: 1px solid;
+        }
+
+        .share-status.success {
+            background: rgba(0, 212, 255, 0.1);
+            color: #0fa49c;
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+
+        .share-status.error {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff6b6b;
+            border-color: rgba(255, 107, 107, 0.3);
+        }
+
+        .share-status.info {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        #downloadLink {
+            display: none;
+            color: #0fa49c;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 12px 20px;
+            border: 1px solid #0fa49c;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            margin: 16px auto;
+            width: fit-content;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        /* Add this to your existing CSS */
+        #cameraPreview.front-camera {
+            transform: scaleX(-1);
+        }
+
+        #downloadLink:hover {
+            background: #0fa49c;
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 480px) {
+            .container {
+                max-width: 100%;
+                border-left: none;
+                border-right: none;
+            }
+
+            .content {
+                padding: 24px 20px 32px;
+            }
+
+            .upload-options {
+                gap: 12px;
+            }
+
+            .upload-option {
+                padding: 24px 16px;
+            }
+
+            .camera-controls {
+                gap: 8px;
+            }
+
+            .camera-controls button {
+                padding: 10px 16px;
+                font-size: 0.85rem;
+                flex: 1;
+                min-width: 0;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-button {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+        }
+
+        /* Enhanced scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0fa49c 0%, #ff6b6b 100%);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #0099cc 0%, #cc5555 100%);
+        }
+
+        /* Hide default file input styling on mobile */
+        input[type="file"]::-webkit-file-upload-button {
+            background: linear-gradient(135deg, #0fa49c 0%, #0099cc 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+    </style>
 </head>
 
 <body>
-  
-    <!-- Your existing content starts here -->
-    
-    <section class="main-section">
-        <header class="kjheader">      
-    <div class="text-right"><img src="exhibit-property.png" width="100px"></div>
-    <img src="logo-unit.png" width="240px">
-    <h3 class="mt-3">Create your #MyTFTLookBook</h3>
-    </header>
-  <div class="upload-container">
-    <div class="upload-area" id="upload-area">
-      <div class="upload-icon">
-        <svg class="icon" viewBox="0 0 24 24">
-          <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"></path>
-        </svg>
-      </div>
-      <p>Tap or drag & drop to upload your image</p>
-      <input type="file" id="file-input" accept="image/*">
-    </div>
-  </div>
+    <div class="background-overlay"></div>
+    <div class="container">
+        <header class="kjheader">
+            <div class="text-right"><img src="exhibit-property.png" width="100px" /></div>
+            <img src="logo-unit.png" width="220px" />
+            <h3 class="mt-3">Create your #MyTFTLookBook</h3>
+        </header>
 
-  <div class="canvas-container" id="canvas-container">
-    <canvas id="lookbook-canvas"></canvas>
-  </div>
+        <div class="content">
+            <!-- Upload Options -->
+            <div class="upload-options">
+                <button class="upload-option" id="openCameraBtn">
+                    <span class="icon">📷</span>
+                    <div class="title">Live Camera</div>
+                    <div class="subtitle">Capture in real-time</div>
+                </button>
+                <button class="upload-option" id="uploadFileBtn">
+                    <span class="icon">📁</span>
+                    <div class="title">Upload File</div>
+                    <div class="subtitle">Select from device</div>
+                </button>
+            </div>
 
-  <div class="loading-indicator" id="loading"></div>
-    <p>Tag @exhibitmagazine and @techfashiontour</p>
-  <div class="button-container" id="button-container">
-    <button class="action-button" id="share-button">
-      <svg class="icon" viewBox="0 0 24 24" width="20" height="20">
-        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"></path>
-      </svg>
-      Share Your Lookbook
-    </button>
-    <button class="action-button" id="download-button">
-      <svg class="icon" viewBox="0 0 24 24" width="20" height="20">
-        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path>
-      </svg>
-      Download Your Lookbook
-    </button>
-    <div class="mt-2 mb-5 d-flex justify-content-center">
-      <a href="https://techfashiontour.com/" target="_blank" class="social-icon-link"><span class="bi-globe"></span></a>
-      <a href="https://www.instagram.com/techfashiontour/" target="_blank" class="social-icon-link"><span class="bi-instagram"></span></a>
-      </div>
-  </div>
+            <!-- File Upload Section -->
+            <div id="fileUploadSection" style="display: none;" class="fade-in">
+                <h3>📂 Select Your Image</h3>
+                <input type="file" id="fileInput" accept="image/*" />
+                <button id="uploadButton" class="btn-primary" disabled>🚀 Process Image</button>
+            </div>
 
-  <!-- <section class="product-info">
-    <h2>What is TFT Lookbook?</h2>
-    <p>TFT Lookbook is a unique platform that combines technology and fashion, allowing users to showcase their personal style through elegantly framed images. Our custom frame overlay adds a premium touch to your photos, perfect for sharing on social media.</p>
+            <!-- Status Section -->
+            <div class="status-section">
+                <p id="status">Choose an option above to get started</p>
+            </div>
 
-    <div class="features">
-      <div class="feature">
-        <i class="icon">
-          <svg viewBox="0 0 24 24">
-            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
-          </svg>
-        </i>
-        <div class="feature-content">
-          <h3>Premium Styling</h3>
-          <p>Exclusive frame designs that elevate your fashion photography</p>
+            <!-- Camera Preview -->
+            <div class="media-preview">
+                <video id="cameraPreview" autoplay muted playsinline webkit-playsinline></video>
+            </div>
+
+            <!-- Camera Controls -->
+            <div class="camera-controls" id="cameraControls">
+                <button id="capturePhotoBtn">📸 Photo</button>
+                <button id="switchCameraBtn">🔄 Switch</button>
+                <button id="closeCameraBtn">❌ Close</button>
+            </div>
+
+            <!-- Loader -->
+            <div id="loader">
+                <div class="spinner"></div>
+                <div class="loader-text">Processing your image...</div>
+            </div>
+
+            <!-- Media Results -->
+            <div class="media-preview">
+                <canvas id="imageCanvas"></canvas>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="action-button" id="downloadButton">📥 Download</button>
+                <button class="action-button" id="shareButton">📤 Share</button>
+            </div>
+
+            <!-- Share Status -->
+            <div class="share-status" id="shareStatus"></div>
+
+            <!-- Reset Button -->
+            <div style="text-align: center;">
+                <button class="reset-button" id="resetButton">🔄 Create Another</button>
+            </div>
         </div>
-      </div>
-      <div class="feature">
-        <i class="icon">
-          <svg viewBox="0 0 24 24">
-            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
-          </svg>
-        </i>
-        <div class="feature-content">
-          <h3>One-Tap Sharing</h3>
-          <p>Instantly share your creations with friends and followers</p>
-        </div>
-      </div>
-      <div class="feature">
-        <i class="icon">
-          <svg viewBox="0 0 24 24">
-            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
-          </svg>
-        </i>
-        <div class="feature-content">
-          <h3>Fashion Community</h3>
-          <p>Join a growing community of fashion enthusiasts showcasing their style</p>
-        </div>
-      </div>
     </div>
 
-    <div class="cta">
-      <a href="https://techfashiontour.com" class="cta-button" target="_blank">Visit TechFashionTour.com</a>
-    </div>
-  </section> -->
+    <script>
+        // DOM Elements
+        const openCameraBtn = document.getElementById('openCameraBtn');
+        const uploadFileBtn = document.getElementById('uploadFileBtn');
+        const fileUploadSection = document.getElementById('fileUploadSection');
+        const input = document.getElementById('fileInput');
+        const button = document.getElementById('uploadButton');
+        const status = document.getElementById('status');
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d');
+        const cameraPreview = document.getElementById('cameraPreview');
+        const cameraControls = document.getElementById('cameraControls');
+        const capturePhotoBtn = document.getElementById('capturePhotoBtn');
+        const switchCameraBtn = document.getElementById('switchCameraBtn');
+        const closeCameraBtn = document.getElementById('closeCameraBtn');
+        const downloadBtn = document.getElementById('downloadButton');
+        const shareBtn = document.getElementById('shareButton');
+        const resetBtn = document.getElementById('resetButton');
+        const loader = document.getElementById('loader');
+        const shareStatus = document.getElementById('shareStatus');
 
-  <footer>
-    <p>&copy; 2025 Tech Fashion Tour. All rights reserved.</p>
-  </footer>
-  </section>
-  <script>
-    // DOM Elements
-    const fileInput = document.getElementById('file-input');
-    const uploadArea = document.getElementById('upload-area');
-    const canvasContainer = document.getElementById('canvas-container');
-    const canvas = document.getElementById('lookbook-canvas');
-    const ctx = canvas.getContext('2d');
-    const shareButton = document.getElementById('share-button');
-    const downloadButton = document.getElementById('download-button');
-    const buttonContainer = document.getElementById('button-container');
-    const loading = document.getElementById('loading');
+        // Variables
+        let resultBlob = null;
+        let cameraStream = null;
+        let currentCamera = 'user'; // 'user' for front camera, 'environment' for back camera
 
-    // Variables
-    const frameSrc = './frame.png'; // Place your overlay frame here
-    const frameImg = new Image();
-    frameImg.crossOrigin = "anonymous";
-    frameImg.src = frameSrc;
-    
-    let userImg = null;
-    let frameLoaded = false;
-    let resultBlob = null;
-    let isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        // Frame image for lookbook
+        const frameImg = new Image();
+        frameImg.crossOrigin = "anonymous";
+        frameImg.src = './frame.png';
+        let frameLoaded = false;
+        let userImg = null;
 
-    // Set up drag and drop for desktop
-    uploadArea.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      uploadArea.style.borderColor = 'var(--primary-color)';
-      uploadArea.style.background = '#222';
-    });
+        // Share status helper
+        function showShareStatus(message, type = 'info') {
+            shareStatus.textContent = message;
+            shareStatus.className = `share-status ${type}`;
+            shareStatus.style.display = 'block';
 
-    uploadArea.addEventListener('dragleave', (e) => {
-      e.preventDefault();
-      uploadArea.style.borderColor = '#444';
-      uploadArea.style.background = 'var(--card-bg)';
-    });
-
-    uploadArea.addEventListener('drop', (e) => {
-      e.preventDefault();
-      uploadArea.style.borderColor = '#444';
-      uploadArea.style.background = 'var(--card-bg)';
-      
-      const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) {
-        processImageFile(file);
-      }
-    });
-
-    // File input change handler
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        processImageFile(file);
-      }
-    });
-
-    // Process the uploaded image
-    function processImageFile(file) {
-      showLoading(true);
-      
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        userImg = new Image();
-        userImg.onload = () => {
-          if (frameLoaded) {
-            drawLookbook();
-          } else {
-            frameImg.onload = drawLookbook;
-          }
-        };
-        userImg.src = event.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    // Frame image onload handler
-    frameImg.onload = function() {
-      frameLoaded = true;
-      canvas.width = frameImg.naturalWidth;
-      canvas.height = frameImg.naturalHeight;
-      
-      if (userImg) drawLookbook();
-    };
-
-    // Draw the lookbook image with frame overlay
-    function drawLookbook() {
-      // Clear canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      if (!userImg || !frameLoaded) return;
-
-      // Calculate crop and scale
-      const frameW = canvas.width, frameH = canvas.height;
-      const imgW = userImg.width, imgH = userImg.height;
-      const frameAspect = frameW / frameH, imgAspect = imgW / imgH;
-      let srcX = 0, srcY = 0, srcW = imgW, srcH = imgH;
-
-      if (imgAspect > frameAspect) {
-        // Image is wider than frame, crop sides
-        srcW = imgH * frameAspect;
-        srcX = (imgW - srcW) / 2;
-      } else {
-        // Image is taller, crop top/bottom
-        srcH = imgW / frameAspect;
-        srcY = (imgH - srcH) / 2;
-      }
-
-      // Draw user image with proper cropping
-      ctx.drawImage(userImg, srcX, srcY, srcW, srcH, 0, 0, frameW, frameH);
-      
-      // Overlay the frame (non-stretchable)
-      ctx.drawImage(frameImg, 0, 0, frameW, frameH);
-
-      // Convert canvas to blob for sharing
-      canvas.toBlob((blob) => {
-        resultBlob = blob;
-        showLoading(false);
-        showResults();
-      }, 'image/jpeg', 0.95);
-    }
-
-    // Show loading indicator
-    function showLoading(show) {
-      loading.style.display = show ? 'block' : 'none';
-      buttonContainer.style.display = 'none';
-    }
-
-    // Show results (canvas and buttons)
-    function showResults() {
-      canvasContainer.style.display = 'block';
-      buttonContainer.style.display = 'flex';
-    }
-
-    // Share button click handler
-    shareButton.addEventListener('click', () => {
-      if (!resultBlob) return;
-      
-      // Create a file from the blob
-      const file = new File([resultBlob], "tft-lookbook.jpg", { type: "image/jpeg" });
-      
-      // Check if Web Share API is supported
-      if (navigator.share) {
-        // Try to share with file if supported
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({
-            files: [file],
-            title: 'TFT Lookbook',
-            text: 'Check out my TFT Lookbook creation!'
-          }).catch(err => {
-            console.error('Error sharing with file:', err);
-            
-            // Try sharing just the text if file sharing fails
-            navigator.share({
-              title: 'TFT Lookbook',
-              text: 'Check out my TFT Lookbook creation!'
-            }).catch(err2 => {
-              console.error('Error sharing without file:', err2);
-              alert('Could not share. Try downloading instead.');
-            });
-          });
-        } else {
-          // Fallback to sharing just text
-          navigator.share({
-            title: 'TFT Lookbook',
-            text: 'Check out my TFT Lookbook creation!'
-          }).catch(err => {
-            console.error('Error sharing:', err);
-            alert('Could not share. Try downloading instead.');
-          });
+            setTimeout(() => {
+                shareStatus.style.display = 'none';
+            }, 4000);
         }
-      } else {
-        // Fallback for devices that don't support Web Share API
-        alert('Sharing is not supported on your device. Please download and share manually.');
-      }
-    });
 
-    // Download button click handler
-    downloadButton.addEventListener('click', () => {
-      if (!resultBlob) return;
-      downloadImage();
-    });
+        // Camera Functions
+        async function openCamera() {
+            try {
+                if (cameraStream) {
+                    stopCamera();
+                }
 
-    // Download image
-    function downloadImage() {
-      const link = document.createElement('a');
-      link.download = 'TFT-Lookbook.jpg';
-      link.href = URL.createObjectURL(resultBlob);
-      link.click();
-      
-      // Clean up
-      setTimeout(() => {
-        URL.revokeObjectURL(link.href);
-      }, 100);
-    }
-  </script>
+                // Progressive constraints - start with optimal, fallback to stable
+                const constraintOptions = [
+                    // Option 1: High quality, smooth performance
+                    {
+                        video: {
+                            facingMode: currentCamera,
+                            width: { ideal: 1280, max: 1920 },
+                            height: { ideal: 720, max: 1080 },
+                            frameRate: { ideal: 30, min: 24 },
+                            aspectRatio: 16 / 9
+                        }
+                    },
+                    // Option 2: Medium quality for stability
+                    {
+                        video: {
+                            facingMode: currentCamera,
+                            width: { ideal: 960, max: 1280 },
+                            height: { ideal: 540, max: 720 },
+                            frameRate: { ideal: 30, min: 15 }
+                        }
+                    },
+                    // Option 3: Basic quality for compatibility
+                    {
+                        video: {
+                            facingMode: currentCamera,
+                            width: { ideal: 640 },
+                            height: { ideal: 480 },
+                            frameRate: 30
+                        }
+                    }
+                ];
+
+                let streamCreated = false;
+
+                for (let i = 0; i < constraintOptions.length && !streamCreated; i++) {
+                    try {
+                        console.log(`Trying camera option ${i + 1}...`);
+                        cameraStream = await navigator.mediaDevices.getUserMedia(constraintOptions[i]);
+                        streamCreated = true;
+
+                        // Get actual settings
+                        const videoTrack = cameraStream.getVideoTracks()[0];
+                        const settings = videoTrack.getSettings();
+
+                        console.log('Camera settings:', settings);
+
+                        cameraPreview.srcObject = cameraStream;
+                        cameraPreview.style.display = 'block';
+
+                        // Handle mirror effect for front camera
+                        if (settings.facingMode === 'user' || currentCamera === 'user') {
+                            cameraPreview.classList.add('front-camera');
+                        } else {
+                            cameraPreview.classList.remove('front-camera');
+                        }
+
+                        cameraControls.style.display = 'flex';
+
+                        hideResults();
+                        fileUploadSection.style.display = 'none';
+
+                        status.textContent = `📷 Camera ready! ${settings.width}x${settings.height} @ ${settings.frameRate || 'auto'} FPS`;
+
+                        // Add load event listener for better performance
+                        cameraPreview.onloadedmetadata = () => {
+                            console.log('Camera stream loaded successfully');
+                        };
+
+                        break;
+
+                    } catch (error) {
+                        console.warn(`Camera option ${i + 1} failed:`, error);
+                        if (i === constraintOptions.length - 1) {
+                            throw error;
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.error('All camera options failed:', error);
+                status.textContent = '❌ Camera access failed';
+                showShareStatus('Camera access failed. Please check permissions and try again.', 'error');
+            }
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => {
+                    track.stop();
+                    console.log('Stopped track:', track.kind);
+                });
+                cameraStream = null;
+            }
+            cameraPreview.style.display = 'none';
+            cameraPreview.classList.remove('front-camera');
+            cameraControls.style.display = 'none';
+        }
+
+        async function switchCamera() {
+            currentCamera = currentCamera === 'user' ? 'environment' : 'user';
+            await openCamera();
+        }
+
+        function capturePhoto() {
+            if (!cameraStream) return;
+
+            const captureCanvas = document.createElement('canvas');
+            const captureCtx = captureCanvas.getContext('2d');
+
+            captureCanvas.width = cameraPreview.videoWidth;
+            captureCanvas.height = cameraPreview.videoHeight;
+
+            // Fix mirror effect for front camera captures
+            if (currentCamera === 'user') {
+                captureCtx.scale(-1, 1);
+                captureCtx.drawImage(cameraPreview, -captureCanvas.width, 0);
+            } else {
+                captureCtx.drawImage(cameraPreview, 0, 0);
+            }
+
+            captureCanvas.toBlob((blob) => {
+                stopCamera();
+                processImageFromBlob(blob);
+            }, 'image/jpeg', 0.9);
+        }
+
+        // Event Listeners for Camera
+        openCameraBtn.addEventListener('click', openCamera);
+        uploadFileBtn.addEventListener('click', () => {
+            stopCamera();
+            fileUploadSection.style.display = 'block';
+            fileUploadSection.classList.add('fade-in');
+            status.textContent = 'Select an image file to upload and process.';
+        });
+        capturePhotoBtn.addEventListener('click', capturePhoto);
+        switchCameraBtn.addEventListener('click', switchCamera);
+        closeCameraBtn.addEventListener('click', () => {
+            stopCamera();
+            status.textContent = 'Choose an option above to get started';
+        });
+
+        // Enhanced share functionality
+        async function shareContent(file, url, title, text) {
+            try {
+                if (navigator.share) {
+                    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+                        console.log('Sharing file directly...');
+                        await navigator.share({
+                            files: [file],
+                            title: title,
+                            text: text
+                        });
+                        showShareStatus('✅ Shared successfully!', 'success');
+                        return;
+                    }
+
+                    if (url) {
+                        console.log('Sharing URL...');
+                        await navigator.share({
+                            title: title,
+                            text: text,
+                            url: url
+                        });
+                        showShareStatus('✅ Shared successfully!', 'success');
+                        return;
+                    }
+
+                    console.log('Sharing text only...');
+                    await navigator.share({
+                        title: title,
+                        text: text
+                    });
+                    showShareStatus('✅ Shared successfully!', 'success');
+
+                } else {
+                    console.log('Web Share API not supported, using fallbacks...');
+                    await handleShareFallback(file, url, title, text);
+                }
+
+            } catch (error) {
+                console.error('Share error:', error);
+                if (error.name === 'AbortError') {
+                    showShareStatus('ℹ️ Share cancelled by user', 'info');
+                } else {
+                    showShareStatus('⚠️ Share failed, trying alternative...', 'error');
+                    await handleShareFallback(file, url, title, text);
+                }
+            }
+        }
+
+        // Fallback sharing methods
+        async function handleShareFallback(file, url, title, text) {
+            try {
+                if (url && navigator.clipboard) {
+                    await navigator.clipboard.writeText(url);
+                    showShareStatus('📋 Link copied to clipboard! Paste anywhere to share.', 'success');
+                    return;
+                }
+
+                if (url) {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = url;
+                    textArea.style.position = 'fixed';
+                    textArea.style.opacity = '0';
+                    document.body.appendChild(textArea);
+                    textArea.select();
+
+                    if (document.execCommand('copy')) {
+                        showShareStatus('📋 Link copied to clipboard! Paste anywhere to share.', 'success');
+                    } else {
+                        showShareStatus('❌ Unable to copy link. Please copy manually from the link above.', 'error');
+                    }
+
+                    document.body.removeChild(textArea);
+                    return;
+                }
+
+                if (file) {
+                    showShareStatus('💾 Downloading file for manual sharing...', 'info');
+                    downloadBtn.click();
+                } else {
+                    showShareStatus('❌ Sharing not supported on this device.', 'error');
+                }
+
+            } catch (fallbackError) {
+                console.error('Fallback share error:', fallbackError);
+                showShareStatus('❌ All sharing methods failed. Please download and share manually.', 'error');
+            }
+        }
+
+        // Load frame image
+        frameImg.onload = function () {
+            frameLoaded = true;
+            canvas.width = frameImg.naturalWidth;
+            canvas.height = frameImg.naturalHeight;
+        };
+
+        // File input handling
+        input.addEventListener('change', () => {
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                if (file.type.startsWith('image/')) {
+                    status.textContent = '✅ Image ready to upload';
+                    button.disabled = false;
+                } else {
+                    status.textContent = '❌ Please select an image file';
+                    button.disabled = true;
+                    return;
+                }
+            }
+        });
+
+        button.addEventListener('click', async () => {
+            const file = input.files[0];
+            if (!file) return;
+            processImageFile(file);
+        });
+
+        // Process image from blob (for camera captures)
+        function processImageFromBlob(blob) {
+            button.disabled = true;
+            status.textContent = 'Processing captured image...';
+            loader.style.display = 'block';
+
+            hideResults();
+
+            const img = new Image();
+            img.onload = () => {
+                userImg = img;
+                if (frameLoaded) {
+                    drawLookbook();
+                } else {
+                    frameImg.onload = drawLookbook;
+                }
+                URL.revokeObjectURL(img.src);
+            };
+            img.src = URL.createObjectURL(blob);
+        }
+
+        // Process image file
+        function processImageFile(file) {
+            button.disabled = true;
+            status.textContent = 'Processing image...';
+            loader.style.display = 'block';
+
+            hideResults();
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                userImg = new Image();
+                userImg.onload = () => {
+                    if (frameLoaded) {
+                        drawLookbook();
+                    } else {
+                        frameImg.onload = drawLookbook;
+                    }
+                };
+                userImg.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Draw lookbook image with frame
+        function drawLookbook() {
+            if (!userImg || !frameLoaded) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const frameW = canvas.width;
+            const frameH = canvas.height;
+            const imgW = userImg.width;
+            const imgH = userImg.height;
+            const frameAspect = frameW / frameH;
+            const imgAspect = imgW / imgH;
+
+            let srcX = 0, srcY = 0, srcW = imgW, srcH = imgH;
+
+            if (imgAspect > frameAspect) {
+                srcW = imgH * frameAspect;
+                srcX = (imgW - srcW) / 2;
+            } else {
+                srcH = imgW / frameAspect;
+                srcY = (imgH - srcH) / 2;
+            }
+
+            ctx.drawImage(userImg, srcX, srcY, srcW, srcH, 0, 0, frameW, frameH);
+            ctx.drawImage(frameImg, 0, 0, frameW, frameH);
+
+            canvas.toBlob((blob) => {
+                resultBlob = blob;
+                loader.style.display = 'none';
+                status.textContent = '🎉 Image processed successfully!';
+                showImageResults();
+                button.disabled = false;
+            }, 'image/jpeg', 0.95);
+        }
+
+        // Show image results
+        function showImageResults() {
+            canvas.style.display = 'block';
+
+            downloadBtn.style.display = 'inline-flex';
+            shareBtn.style.display = 'inline-flex';
+            resetBtn.style.display = 'inline-block';
+
+            setupImageButtons();
+        }
+
+        // Hide all results
+        function hideResults() {
+            canvas.style.display = 'none';
+            downloadBtn.style.display = 'none';
+            shareBtn.style.display = 'none';
+            resetBtn.style.display = 'none';
+            shareStatus.style.display = 'none';
+        }
+
+        // Setup image button handlers
+        function setupImageButtons() {
+            downloadBtn.onclick = () => {
+                if (!resultBlob) return;
+                const link = document.createElement('a');
+                link.download = 'TFT-Lookbook.jpg';
+                link.href = URL.createObjectURL(resultBlob);
+                link.click();
+                setTimeout(() => {
+                    URL.revokeObjectURL(link.href);
+                }, 100);
+            };
+
+            shareBtn.onclick = async () => {
+                if (!resultBlob) return;
+
+                showShareStatus('🔄 Preparing to share...', 'info');
+
+                const file = new File([resultBlob], "TFT-Lookbook.jpg", { type: "image/jpeg" });
+
+                await shareContent(
+                    file,
+                    null,
+                    'My TFT Lookbook 🎮',
+                    'Check out my awesome TFT Lookbook! Created with TFT Lookbook Generator. #MyTFTLookBook #TechFashionTour'
+                );
+            };
+        }
+
+        // Reset function
+        resetBtn.addEventListener('click', () => {
+            input.value = '';
+            status.textContent = 'Choose an option above to get started';
+            button.disabled = true;
+            hideResults();
+            stopCamera();
+            fileUploadSection.style.display = 'none';
+            resultBlob = null;
+            userImg = null;
+        });
+
+        // Test capabilities on load
+        window.addEventListener('load', () => {
+            if (navigator.share) {
+                console.log('✅ Web Share API supported');
+            } else {
+                console.log('ℹ️ Web Share API not supported, using fallbacks');
+            }
+
+            if (navigator.canShare) {
+                console.log('✅ File sharing supported');
+            } else {
+                console.log('ℹ️ File sharing may not be supported');
+            }
+
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                console.log('✅ Camera access supported');
+            } else {
+                console.log('ℹ️ Camera access not supported');
+                openCameraBtn.classList.add('disabled');
+                openCameraBtn.innerHTML = '<span class="icon">📷</span><div class="title">Camera Not Available</div><div class="subtitle">Not supported</div>';
+                openCameraBtn.disabled = true;
+            }
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            stopCamera();
+        });
+    </script>
+
 </body>
 
 </html>
